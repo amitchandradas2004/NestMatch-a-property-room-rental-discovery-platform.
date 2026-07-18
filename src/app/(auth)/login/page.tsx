@@ -59,9 +59,6 @@ export default function LoginPage() {
         password: values.password,
         callbackURL: "/",
       });
-
-
-
       if (error) {
         setApiError(error.message || "Invalid email or password.");
         toast.error(error.message || "Invalid email or password.");
@@ -83,7 +80,11 @@ export default function LoginPage() {
     }
   };
 
-
+  const handleGoogleSignIn = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -191,7 +192,7 @@ export default function LoginPage() {
         <div className="h-px bg-card-border flex-grow" />{" "}
       </div>{" "}
       <GoogleButton
-        onClick={() => alert("Redirecting to Google authentication...")}
+        onClick={handleGoogleSignIn}
         disabled={isSubmitting}
       />{" "}
       <p className="text-center text-xs text-muted font-medium pt-2 select-none">

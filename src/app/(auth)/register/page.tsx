@@ -128,6 +128,11 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -298,7 +303,7 @@ export default function RegisterPage() {
       </div>
 
       <GoogleButton
-        onClick={() => alert("Redirecting to Google authentication...")}
+        onClick={handleGoogleSignIn}
         disabled={isSubmitting}
       />
 
