@@ -18,7 +18,8 @@ import {
   Loader2,
   User,
   LogOut,
-  X
+  X,
+  Eye
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { authClient } from "../../lib/auth-client";
@@ -51,6 +52,29 @@ const changePasswordSchema = z
   });
 type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
 
+interface ListingItem {
+  _id: string;
+  title: string;
+  shortDescription: string;
+  propertyType: string;
+  furnished: string;
+  price: number;
+  bedrooms: number;
+  bathrooms: number;
+  sizeSqft: number;
+  location: {
+    address: string;
+    city: string;
+  };
+  images?: { url: string }[];
+}
+
+interface SavedItem {
+  _id: string;
+  listingId: string;
+  listing: ListingItem;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -58,6 +82,10 @@ export default function ProfilePage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+
+  const [createdListings, setCreatedListings] = useState<ListingItem[]>([]);
+  const [savedListings, setSavedListings] = useState<SavedItem[]>([]);
+  const [loadingListings, setLoadingListings] = useState(true);
 
   const {
     data: session,
@@ -71,6 +99,75 @@ export default function ProfilePage() {
       router.push("/login");
     }
   }, [isPending, session, router]);
+
+  useEffect(() => {
+    const fetchProfileData = async (email: string) => {
+      try {
+        setLoadingListings(true);
+        // Fetch created listings
+        const createdRes = await fetch(`/api/listings?email=${email}`);
+        const createdData = await createdRes.json();
+        if (createdRes.ok && createdData.success) {
+          setCreatedListings(createdData.data || []);
+        }
+
+        // Fetch saved listings
+        const savedRes = await fetch("/api/saved");
+        const savedData = await savedRes.json();
+        if (savedRes.ok && savedData.success) {
+          setSavedListings(savedData.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile activities:", err);
+      } finally {
+        setLoadingListings(false);
+      }
+    };
+
+    if (session?.user?.email) {
+      fetchProfileData(session.user.email);
+    }
+  }, [session]);
+
+  const handleDeleteCreated = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this listing permanently? This cannot be undone.")) return;
+
+    try {
+      const res = await fetch(`/api/listings?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Listing deleted successfully!");
+        setCreatedListings((prev) => prev.filter((item) => item._id !== id));
+      } else {
+        toast.error(data.message || "Failed to delete listing.");
+      }
+    } catch {
+      toast.error("An error occurred. Please try again.");
+    }
+  };
+
+  const handleRemoveSaved = async (savedId: string) => {
+    if (!confirm("Are you sure you want to remove this bookmark?")) return;
+
+    try {
+      const res = await fetch(`/api/saved?id=${savedId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Bookmark removed successfully!");
+        setSavedListings((prev) => prev.filter((item) => item._id !== savedId));
+      } else {
+        toast.error(data.message || "Failed to remove bookmark.");
+      }
+    } catch {
+      toast.error("An error occurred. Please try again.");
+    }
+  };
 
   // Profile Form initialization
   const {
@@ -367,12 +464,16 @@ export default function ProfilePage() {
               <div className="p-4 bg-neutral-bg rounded-xl border border-card-border flex flex-col items-center justify-center text-center space-y-1.5">
                 <Building className="h-5 w-5 text-primary" />
                 <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Created</span>
-                <span className="text-lg font-black text-foreground">0</span>
+                <span className="text-lg font-black text-foreground">
+                  {loadingListings ? <Loader2 className="h-4 w-4 animate-spin text-muted" /> : createdListings.length}
+                </span>
               </div>
               <div className="p-4 bg-neutral-bg rounded-xl border border-card-border flex flex-col items-center justify-center text-center space-y-1.5">
                 <Heart className="h-5 w-5 text-rose-500" />
                 <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Saved</span>
-                <span className="text-lg font-black text-foreground">0</span>
+                <span className="text-lg font-black text-foreground">
+                  {loadingListings ? <Loader2 className="h-4 w-4 animate-spin text-muted" /> : savedListings.length}
+                </span>
               </div>
             </div>
 
@@ -421,6 +522,155 @@ export default function ProfilePage() {
               </button>
             </div>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Published and Saved listings of the current user */}
+      <div className="space-y-10 pt-6">
+        {/* Created Listings Table */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2">
+            <Building className="h-5 w-5 text-primary" />
+            <span>My Published Listings</span>
+          </h2>
+          {loadingListings ? (
+            <div className="h-28 bg-card-bg border border-card-border rounded-2xl animate-pulse" />
+          ) : createdListings.length === 0 ? (
+            <div className="p-8 text-center bg-card-bg border border-card-border rounded-2xl text-xs font-bold text-muted">
+              You haven&apos;t published any property listings yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
+                    <th className="px-6 py-4">Preview</th>
+                    <th className="px-6 py-4">Title</th>
+                    <th className="px-6 py-4">Location</th>
+                    <th className="px-6 py-4">Monthly Rent</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
+                  {createdListings.map((listing) => (
+                    <tr key={listing._id} className="hover:bg-neutral-bg/30 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
+                          {listing.images && listing.images[0]?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={listing.images[0].url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <Building className="h-4 w-4 text-slate-400" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-[220px] truncate">
+                          <p className="font-extrabold text-foreground truncate">{listing.title}</p>
+                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{listing.propertyType}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-foreground truncate max-w-[200px]">{listing.location.address}, {listing.location.city}</p>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-black text-primary">BDT {listing.price.toLocaleString()}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/apartments/${listing._id}`}
+                            className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteCreated(listing._id)}
+                            className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Saved Listings Table */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2">
+            <Heart className="h-5 w-5 text-rose-500" />
+            <span>My Bookmarked Apartments</span>
+          </h2>
+          {loadingListings ? (
+            <div className="h-28 bg-card-bg border border-card-border rounded-2xl animate-pulse" />
+          ) : savedListings.length === 0 ? (
+            <div className="p-8 text-center bg-card-bg border border-card-border rounded-2xl text-xs font-bold text-muted">
+              You haven&apos;t saved any listings yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
+                    <th className="px-6 py-4">Preview</th>
+                    <th className="px-6 py-4">Title</th>
+                    <th className="px-6 py-4">Location</th>
+                    <th className="px-6 py-4">Monthly Rent</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
+                  {savedListings.map((item) => (
+                    <tr key={item._id} className="hover:bg-neutral-bg/30 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
+                          {item.listing.images && item.listing.images[0]?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={item.listing.images[0].url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <Building className="h-4 w-4 text-slate-400" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-[220px] truncate">
+                          <p className="font-extrabold text-foreground truncate">{item.listing.title}</p>
+                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{item.listing.propertyType}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-foreground truncate max-w-[200px]">{item.listing.location.address}, {item.listing.location.city}</p>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-black text-primary">BDT {item.listing.price.toLocaleString()}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/apartments/${item.listing._id}`}
+                            className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleRemoveSaved(item._id)}
+                            className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 

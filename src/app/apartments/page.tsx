@@ -41,6 +41,9 @@ export default function ApartmentsPage() {
   const [selectedType, setSelectedType] = useState("all");
   const [maxPrice, setMaxPrice] = useState(250000);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 12;
+
   useEffect(() => {
     const fetchListings = async () => {
       try {
@@ -75,17 +78,21 @@ export default function ApartmentsPage() {
     return matchesSearch && matchesType && matchesPrice;
   });
 
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredListings.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(filteredListings.length / cardsPerPage);
+
   return (
     <div className="min-h-screen bg-neutral-bg text-foreground pb-24 select-none">
       {/* Hero Header Section */}
-      <div className="relative overflow-hidden bg-slate-900 dark:bg-slate-950 py-24 sm:py-32">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-bg" />
+      <div className="relative overflow-hidden bg-slate-50 dark:bg-slate-950 border-b border-card-border py-24 sm:py-32">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center space-y-4">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-block px-3 py-1 text-xxs font-extrabold bg-primary/20 text-primary border border-primary/30 rounded-full uppercase tracking-widest"
+            className="inline-block px-3 py-1 text-xxs font-extrabold bg-primary/10 dark:bg-primary/20 text-primary border border-primary/20 dark:border-primary/30 rounded-full uppercase tracking-widest"
           >
             Explore Spaces
           </motion.span>
@@ -93,7 +100,7 @@ export default function ApartmentsPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-white"
+            className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white"
           >
             Find Your Next Cozy Match
           </motion.h1>
@@ -101,7 +108,7 @@ export default function ApartmentsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="max-w-2xl mx-auto text-sm sm:text-base text-slate-350 font-medium"
+            className="max-w-2xl mx-auto text-sm sm:text-base text-slate-600 dark:text-slate-350 font-medium animate-pulse-slow"
           >
             Browse real-time listings of flats, studios, shared spaces, and homes in your city. Premium amenities and secure verification.
           </motion.p>
@@ -125,7 +132,10 @@ export default function ApartmentsPage() {
                 type="text"
                 placeholder="Search by title, city, or address..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 focus:ring-primary/10 dark:focus:ring-primary/15 focus:border-primary text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-4 transition-all duration-200 text-sm font-semibold"
               />
             </div>
@@ -136,7 +146,10 @@ export default function ApartmentsPage() {
                 <button
                   key={type}
                   type="button"
-                  onClick={() => setSelectedType(type)}
+                  onClick={() => {
+                    setSelectedType(type);
+                    setCurrentPage(1);
+                  }}
                   className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all uppercase tracking-wider cursor-pointer ${selectedType === type
                       ? "border-primary bg-primary/10 text-primary shadow-sm"
                       : "border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30 text-muted hover:text-foreground hover:border-slate-350 dark:hover:border-slate-700"
@@ -164,7 +177,10 @@ export default function ApartmentsPage() {
                 max="250000"
                 step="5000"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  setMaxPrice(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
                 className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
@@ -199,103 +215,141 @@ export default function ApartmentsPage() {
             </div>
           </motion.div>
         ) : (
-          /* Cards Grid List */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence mode="popLayout">
-              {filteredListings.map((listing) => (
-                <motion.div
-                  key={listing._id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                  transition={{ duration: 0.3 }}
-                  className="group bg-card-bg border border-card-border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
-                >
-                  {/* Image showcase wrapper */}
-                  <div className="relative h-56 bg-slate-150 dark:bg-slate-900/80 overflow-hidden flex-shrink-0">
-                    {listing.images && listing.images[0]?.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={listing.images[0].url}
-                        alt={listing.title}
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-muted bg-slate-100 dark:bg-slate-900/40">
-                        <Building className="h-10 w-10" />
-                      </div>
-                    )}
+          <div className="space-y-12">
+            {/* Cards Grid List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <AnimatePresence mode="popLayout">
+                {currentCards.map((listing) => (
+                  <motion.div
+                    key={listing._id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                    transition={{ duration: 0.3 }}
+                    className="group bg-card-bg border border-card-border rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+                  >
+                    {/* Image showcase wrapper */}
+                    <div className="relative h-56 bg-slate-150 dark:bg-slate-900/80 overflow-hidden flex-shrink-0">
+                      {listing.images && listing.images[0]?.url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={listing.images[0].url}
+                          alt={listing.title}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-muted bg-slate-100 dark:bg-slate-900/40">
+                          <Building className="h-10 w-10" />
+                        </div>
+                      )}
 
-                    {/* Property type badge */}
-                    <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-extrabold bg-black/60 text-white backdrop-blur-sm rounded-lg uppercase tracking-wider">
-                      {listing.propertyType}
-                    </span>
+                      {/* Property type badge */}
+                      <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-extrabold bg-black/60 text-white backdrop-blur-sm rounded-lg uppercase tracking-wider">
+                        {listing.propertyType}
+                      </span>
 
-                    {/* Furnished Status Badge */}
-                    <span className="absolute top-4 right-4 px-2.5 py-1 text-[10px] font-extrabold bg-primary text-white rounded-lg uppercase tracking-wider shadow-md shadow-primary/10">
-                      {listing.furnished}
-                    </span>
-                  </div>
-
-                  {/* Core specifications and details */}
-                  <div className="p-6 flex-grow flex flex-col justify-between space-y-5">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-extrabold text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                          {listing.title}
-                        </h3>
-                      </div>
-
-                      <p className="text-xs text-muted font-semibold line-clamp-2 leading-relaxed">
-                        {listing.shortDescription}
-                      </p>
-
-                      <div className="flex items-center gap-1.5 text-xs text-muted font-bold">
-                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="truncate">
-                          {listing.location.address}, {listing.location.city}
-                        </span>
-                      </div>
+                      {/* Furnished Status Badge */}
+                      <span className="absolute top-4 right-4 px-2.5 py-1 text-[10px] font-extrabold bg-primary text-white rounded-lg uppercase tracking-wider shadow-md shadow-primary/10">
+                        {listing.furnished}
+                      </span>
                     </div>
 
-                    {/* Specs Row */}
-                    <div className="grid grid-cols-3 gap-2 py-3.5 border-y border-card-border text-center text-xs font-bold text-muted">
-                      <div className="flex flex-col items-center gap-1 border-r border-card-border">
-                        <Bed className="h-4 w-4 text-primary" />
-                        <span>{listing.bedrooms} Beds</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1 border-r border-card-border">
-                        <Bath className="h-4 w-4 text-primary" />
-                        <span>{listing.bathrooms} Beds</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <Maximize className="h-4 w-4 text-primary" />
-                        <span>{listing.sizeSqft} Sqft</span>
-                      </div>
-                    </div>
+                    {/* Core specifications and details */}
+                    <div className="p-6 flex-grow flex flex-col justify-between space-y-5">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start gap-2">
+                          <h3 className="font-extrabold text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                            {listing.title}
+                          </h3>
+                        </div>
 
-                    {/* Price and Action button */}
-                    <div className="flex justify-between items-center pt-2">
-                      <div>
-                        <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Monthly Rent</p>
-                        <p className="text-lg font-black text-primary mt-0.5">
-                          BDT {listing.price.toLocaleString()}
+                        <p className="text-xs text-muted font-semibold line-clamp-2 leading-relaxed">
+                          {listing.shortDescription}
                         </p>
+
+                        <div className="flex items-center gap-1.5 text-xs text-muted font-bold">
+                          <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="truncate">
+                            {listing.location.address}, {listing.location.city}
+                          </span>
+                        </div>
                       </div>
 
-                      <Link
-                        href={`/apartments/${listing._id}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold bg-primary text-white hover:bg-primary-hover rounded-xl shadow-md shadow-primary/10 group-hover:shadow-primary/25 hover:-translate-y-0.5 transition-all cursor-pointer"
-                      >
-                        <span>View Details</span>
-                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
+                      {/* Specs Row */}
+                      <div className="grid grid-cols-3 gap-2 py-3.5 border-y border-card-border text-center text-xs font-bold text-muted">
+                        <div className="flex flex-col items-center gap-1 border-r border-card-border">
+                          <Bed className="h-4 w-4 text-primary" />
+                          <span>{listing.bedrooms} Beds</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 border-r border-card-border">
+                          <Bath className="h-4 w-4 text-primary" />
+                          <span>{listing.bathrooms} Baths</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                          <Maximize className="h-4 w-4 text-primary" />
+                          <span>{listing.sizeSqft} Sqft</span>
+                        </div>
+                      </div>
+
+                      {/* Price and Action button */}
+                      <div className="flex justify-between items-center pt-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Monthly Rent</p>
+                          <p className="text-lg font-black text-primary mt-0.5">
+                            BDT {listing.price.toLocaleString()}
+                          </p>
+                        </div>
+
+                        <Link
+                          href={`/apartments/${listing._id}`}
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold bg-primary text-white hover:bg-primary-hover rounded-xl shadow-md shadow-primary/10 group-hover:shadow-primary/25 hover:-translate-y-0.5 transition-all cursor-pointer"
+                        >
+                          <span>View Details</span>
+                          <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-6">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pageNum = idx + 1;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                        currentPage === pageNum
+                          ? "bg-primary text-white shadow-md shadow-primary/10"
+                          : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
