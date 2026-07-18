@@ -44,6 +44,8 @@ export default function ManageListingsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [listingToDelete, setListingToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Route protection redirect
   useEffect(() => {
@@ -92,7 +94,14 @@ export default function ManageListingsPage() {
 
       if (res.ok && data.success) {
         toast.success("Listing deleted successfully!");
-        setListings((prev) => prev.filter((item) => item._id !== listingToDelete));
+        setListings((prev) => {
+          const newListings = prev.filter((item) => item._id !== listingToDelete);
+          const totalPages = Math.ceil(newListings.length / itemsPerPage);
+          if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+          }
+          return newListings;
+        });
       } else {
         toast.error(data.message || "Failed to delete listing.");
       }
@@ -179,113 +188,151 @@ export default function ManageListingsPage() {
           </Link>
         </motion.div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
-          <table className="w-full text-left border-collapse min-w-[700px]">
-            <thead>
-              <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider select-none">
-                <th className="px-6 py-4">Preview</th>
-                <th className="px-6 py-4">Title</th>
-                <th className="px-6 py-4">Location</th>
-                <th className="px-6 py-4">Specifications</th>
-                <th className="px-6 py-4">Monthly Rent</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
-              <AnimatePresence mode="popLayout">
-                {listings.map((listing) => (
-                  <motion.tr
-                    key={listing._id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="hover:bg-neutral-bg/30 transition-colors animate-in fade-in duration-300"
+        <div className="space-y-6">
+          <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
+            <table className="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+                <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider select-none">
+                  <th className="px-6 py-4">Preview</th>
+                  <th className="px-6 py-4">Title</th>
+                  <th className="px-6 py-4">Location</th>
+                  <th className="px-6 py-4">Specifications</th>
+                  <th className="px-6 py-4">Monthly Rent</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
+                <AnimatePresence mode="popLayout">
+                  {listings.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((listing) => (
+                    <motion.tr
+                      key={listing._id}
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="hover:bg-neutral-bg/30 transition-colors animate-in fade-in duration-300"
+                    >
+                      {/* Preview Image */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
+                          {listing.images && listing.images[0]?.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={listing.images[0].url}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Building className="h-4 w-4 text-slate-400" />
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Title */}
+                      <td className="px-6 py-4">
+                        <div className="max-w-[200px] truncate">
+                          <p className="font-extrabold text-foreground truncate">{listing.title}</p>
+                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">
+                            {listing.propertyType} • {listing.furnished}
+                          </p>
+                        </div>
+                      </td>
+
+                      {/* Location */}
+                      <td className="px-6 py-4">
+                        <div className="max-w-[180px] truncate text-xs font-bold text-muted">
+                          <p className="text-foreground font-semibold truncate">{listing.location.address}</p>
+                          <p className="truncate mt-0.5">{listing.location.city}</p>
+                        </div>
+                      </td>
+
+                      {/* Specifications */}
+                      <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <Bed className="h-3.5 w-3.5 text-primary" />
+                            <span>{listing.bedrooms} Beds</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Bath className="h-3.5 w-3.5 text-primary" />
+                            <span>{listing.bathrooms} Baths</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Maximize className="h-3.5 w-3.5 text-primary" />
+                            <span>{listing.sizeSqft} Sqft</span>
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Price */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-black text-primary">
+                          BDT {listing.price.toLocaleString()}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/apartments/${listing._id}`}
+                            className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                            title="View Listing Details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => openDeleteModal(listing._id)}
+                            className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            title="Delete Listing"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          {Math.ceil(listings.length / itemsPerPage) > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+              >
+                Previous
+              </button>
+              {Array.from({ length: Math.ceil(listings.length / itemsPerPage) }).map((_, idx) => {
+                const pageNum = idx + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                      currentPage === pageNum
+                        ? "bg-primary text-white shadow-md shadow-primary/10"
+                        : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                    }`}
                   >
-                    {/* Preview Image */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
-                        {listing.images && listing.images[0]?.url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={listing.images[0].url}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <Building className="h-4 w-4 text-slate-400" />
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Title */}
-                    <td className="px-6 py-4">
-                      <div className="max-w-[200px] truncate">
-                        <p className="font-extrabold text-foreground truncate">{listing.title}</p>
-                        <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">
-                          {listing.propertyType} • {listing.furnished}
-                        </p>
-                      </div>
-                    </td>
-
-                    {/* Location */}
-                    <td className="px-6 py-4">
-                      <div className="max-w-[180px] truncate text-xs font-bold text-muted">
-                        <p className="text-foreground font-semibold truncate">{listing.location.address}</p>
-                        <p className="truncate mt-0.5">{listing.location.city}</p>
-                      </div>
-                    </td>
-
-                    {/* Specifications */}
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1">
-                          <Bed className="h-3.5 w-3.5 text-primary" />
-                          <span>{listing.bedrooms} Beds</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Bath className="h-3.5 w-3.5 text-primary" />
-                          <span>{listing.bathrooms} Baths</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Maximize className="h-3.5 w-3.5 text-primary" />
-                          <span>{listing.sizeSqft} Sqft</span>
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Price */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-black text-primary">
-                        BDT {listing.price.toLocaleString()}
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/apartments/${listing._id}`}
-                          className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                          title="View Listing Details"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                        <button
-                          onClick={() => openDeleteModal(listing._id)}
-                          className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                          title="Delete Listing"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </AnimatePresence>
-            </tbody>
-          </table>
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(listings.length / itemsPerPage)))}
+                disabled={currentPage === Math.ceil(listings.length / itemsPerPage)}
+                className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
 
