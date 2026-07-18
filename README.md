@@ -1,15 +1,14 @@
 # 🏠 NextMatch — AI-Powered Property Rental Finder
 
-NestMatch is a full-stack property and room rental discovery platform where users can browse, filter, and list rental properties. It integrates two intelligent AI agents — a **Smart Recommendation Engine** and an **AI Document Intelligence** tool — to help renters find their perfect match and landlords understand lease documents instantly.
+NextMatch is a full-stack property and room rental discovery platform where users can browse, filter, and list rental properties. It integrates two intelligent AI agents — a **Smart Recommendation Engine** and an **AI Document Intelligence** tool — to help renters find their perfect match and landlords understand lease documents instantly.
 
 ---
 
 ## 🔗 Live Links
 
-- **Live Website:** [https://nestmatch.vercel.app](https://nestmatch.vercel.app)
-- **Frontend GitHub Repo:** [https://github.com/your-username/nestmatch-client](https://github.com/your-username/nestmatch-client)
-- **Backend GitHub Repo:** [https://github.com/your-username/nestmatch-server](https://github.com/your-username/nestmatch-server)
-
+- **Live Website:** [https://next-match-a-property-room-rental-d.vercel.app](https://next-match-a-property-room-rental-d.vercel.app)
+- **Frontend GitHub Repo:** [https://github.com/amitchandradas2004/NextMatch-A-Property-Room-Rental-Discovery-Platform.](https://github.com/amitchandradas2004/NextMatch-A-Property-Room-Rental-Discovery-Platform.)
+ 
 ---
 
 ## 📋 Table of Contents

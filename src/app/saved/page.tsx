@@ -177,7 +177,7 @@ export default function SavedListingsPage() {
           <div className="space-y-1">
             <h3 className="text-sm font-extrabold">No saved apartments</h3>
             <p className="text-xs text-muted font-bold">
-              You haven&apos;t saved any property listings on NestMatch yet.
+              You haven&apos;t saved any property listings on NextMatch yet.
             </p>
           </div>
           <Link

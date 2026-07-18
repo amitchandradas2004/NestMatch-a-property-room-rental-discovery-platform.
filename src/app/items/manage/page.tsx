@@ -134,7 +134,7 @@ export default function ManageListingsPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Manage My Listings</h1>
           <p className="text-sm text-muted font-semibold mt-1.5">
-            Monitor and manage apartment listings you published on NestMatch.
+            Monitor and manage apartment listings you published on NextMatch.
           </p>
         </div>
         <Link
@@ -167,7 +167,7 @@ export default function ManageListingsPage() {
           <div className="space-y-1">
             <h3 className="text-sm font-extrabold">No active listings</h3>
             <p className="text-xs text-muted font-bold">
-              You haven&apos;t listed any property space on NestMatch yet.
+              You haven&apos;t listed any property space on NextMatch yet.
             </p>
           </div>
           <Link

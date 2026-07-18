@@ -70,7 +70,7 @@ export default function LoginPage() {
         <div>
           <h3 className="font-heading text-base font-bold text-slate-900">Welcome Back!</h3>
           <p className="font-body mt-1 text-sm text-slate-600">
-            You have successfully signed in to <span className="font-semibold text-indigo-600">NestMatch</span>.
+            You have successfully signed in to <span className="font-semibold text-indigo-600">NextMatch</span>.
           </p>
         </div>
       );
