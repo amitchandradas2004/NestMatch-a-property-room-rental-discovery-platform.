@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Loader2, AlertCircle, CheckCircle2, User } from "lucide-react";
+import { Mail, Loader2, AlertCircle, CheckCircle2, User, Image as ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { useTheme } from "next-themes";
 import AuthInput from "../../../components/auth-input";
 import PasswordInput from "../../../components/password-input";
 import GoogleButton from "../../../components/google-button";
+import { authClient } from "../../../lib/auth-client";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 // Register Schema using Zod
 const registerSchema = z
@@ -23,6 +26,7 @@ const registerSchema = z
       .refine((val) => /[a-zA-Z]/.test(val), "Password must include at least one letter")
       .refine((val) => /[0-9]/.test(val), "Password must include at least one number"),
     confirmPassword: z.string().min(1, "Confirm password is required"),
+    image: z.string().min(1, "Profile image URL is required").url("Invalid image URL"),
     agree: z.literal(true, {
       message: "You must accept the terms and privacy policy",
     }),
@@ -33,17 +37,6 @@ const registerSchema = z
   });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
-
-// Mock API Call to easily wire in backend later
-const authApi = {
-  register: async (values: RegisterFormValues): Promise<{ success: boolean; message: string }> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true, message: `Account created successfully for ${values.name}!` });
-      }, 1500);
-    });
-  },
-};
 
 export default function RegisterPage() {
   const [apiError, setApiError] = useState<string | null>(null);
@@ -60,7 +53,8 @@ export default function RegisterPage() {
   });
 
   const passwordVal = watch("password", "");
-
+  const router = useRouter();
+  const { resolvedTheme } = useTheme();
   // Strength algorithm (0 to 3)
   const calculateStrength = (pass: string): { score: number; label: string; color: string } => {
     if (!pass) return { score: 0, label: "", color: "bg-card-border" };
@@ -86,15 +80,51 @@ export default function RegisterPage() {
     setApiError(null);
     setApiSuccess(null);
     try {
-      console.log(values);
-      const response = await authApi.register(values);
-      if (response.success) {
-        setApiSuccess(response.message);
+      // console.log(values);
+      const { data, error } = await authClient.signUp.email({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        image: values.image,
+        callbackURL: "/login"
+      });
+
+
+
+      if (error) {
+        setApiError(error.message || "Registration failed. Please try again.");
       } else {
-        setApiError(response.message);
+        setApiSuccess("Account created successfully!");
+        toast.success(
+          <div>
+            <h2 className="font-heading text-lg font-bold">
+              Welcome to ScholarBridge!
+            </h2>
+
+            <p className="font-body mt-1 text-sm opacity-80">
+              Your account has been created successfully.
+            </p>
+          </div>,
+          {
+            icon: "🎉",
+            style:
+              resolvedTheme === "dark"
+                ? {
+                  background: "#0f172a",
+                  color: "#f8fafc",
+                  border: "1px solid #334155",
+                  borderRadius: "16px",
+                  padding: "16px",
+                  boxShadow: "0 10px 30px rgba(0,0,0,.45)",
+                }
+                : undefined,
+          },
+        );
+        router.push('/login')
       }
     } catch {
       setApiError("Registration failed. Please check your connection.");
+
     }
   };
 
@@ -154,6 +184,16 @@ export default function RegisterPage() {
           error={errors.email?.message}
           disabled={isSubmitting}
           {...register("email")}
+        />
+
+        <AuthInput
+          id="image"
+          label="Profile Image URL"
+          placeholder="https://example.com/avatar.png"
+          icon={ImageIcon}
+          error={errors.image?.message}
+          disabled={isSubmitting}
+          {...register("image")}
         />
 
         <div>

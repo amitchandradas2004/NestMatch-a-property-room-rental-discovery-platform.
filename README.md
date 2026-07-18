@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏠 NextMatch — AI-Powered Property Rental Finder
 
-## Getting Started
+NestMatch is a full-stack property and room rental discovery platform where users can browse, filter, and list rental properties. It integrates two intelligent AI agents — a **Smart Recommendation Engine** and an **AI Document Intelligence** tool — to help renters find their perfect match and landlords understand lease documents instantly.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🔗 Live Links
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Live Website:** [https://nestmatch.vercel.app](https://nestmatch.vercel.app)
+- **Frontend GitHub Repo:** [https://github.com/your-username/nestmatch-client](https://github.com/your-username/nestmatch-client)
+- **Backend GitHub Repo:** [https://github.com/your-username/nestmatch-server](https://github.com/your-username/nestmatch-server)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📋 Table of Contents
 
-## Learn More
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [AI Features](#-ai-features)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [API Routes](#-api-routes)
+- [Screenshots](#-screenshots)
+- [License](#-license)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ✨ Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Fully responsive homepage with 7+ sections and dark/light mode
+- Property listing explore page with search, filters, sorting, and pagination
+- Detailed property pages with image galleries, specs, and reviews
+- Secure authentication with JWT and Google OAuth
+- Demo login for quick testing
+- Protected routes for adding and managing listings
+- AI-powered property recommendations
+- AI-powered lease document summarization
+- Clean, consistent, accessible UI/UX across all devices
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠 Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Frontend:**
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- TanStack Query
+- Recharts
+- React Hook Form + Zod
+
+**Backend:**
+- Node.js
+- Express.js
+- TypeScript
+- MongoDB + Mongoose
+- JWT Authentication + Google OAuth
+
+**AI Integration:**
+- [OpenAI / Gemini / Groq / Claude] — *(replace with the provider you used)*
+
+---
+
+## 🤖 AI Features
+
+### 1. Smart Recommendation Engine
+Analyzes user preferences (budget, location, must-haves) and available listings to generate ranked, context-aware property recommendations with clear reasoning. Learns from user feedback (thumbs up/down) to refine future results.
+
+### 2. AI Document Intelligence
+Landlords upload a lease/agreement document, and the AI extracts and summarizes key terms — rent, deposit, notice period, and restrictions — displayed on the listing's details page and available as a downloadable summary.
+
+---
+
+## 📁 Project Structure
