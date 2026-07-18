@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export default function NotFound() {
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden bg-neutral-bg select-none">
+    <div className="relative min-h-screen flex flex-col justify-center items-center py-18 px-4 sm:px-6 lg:px-8 overflow-hidden bg-neutral-bg select-none">
 
       {/* Background glowing decorations */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
