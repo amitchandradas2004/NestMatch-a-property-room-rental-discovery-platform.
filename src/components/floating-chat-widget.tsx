@@ -81,7 +81,7 @@ export default function FloatingChatWidget() {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`/api/ai/chat/${conversationId}`);
+        const res = await fetch(`/api/ai/chat/${conversationId}`, { credentials: "include" });
         const data = await res.json();
         if (res.ok && data.success) {
           setMessages(data.history || []);
@@ -160,6 +160,7 @@ export default function FloatingChatWidget() {
     try {
       const res = await fetch(`/api/ai/chat/${conversationId}`, {
         method: "DELETE",
+        credentials: "include",
       });
       if (res.ok) {
         setMessages([]);

@@ -63,7 +63,7 @@ export default function ApartmentsPage() {
     const fetchListings = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/listings");
+        const res = await fetch("/api/listings", { credentials: "include" });
         const resData = await res.json();
         if (res.ok && resData.success) {
           setListings(resData.data || []);
