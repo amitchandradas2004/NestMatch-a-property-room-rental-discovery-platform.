@@ -12,7 +12,7 @@ import {
   ShieldAlert,
   Bot
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import toast from "react-hot-toast";
 
 interface ChatMessage {
@@ -31,6 +31,26 @@ export default function FloatingChatWidget() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
+
+  const dragControls = useDragControls();
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    const target = e.target as HTMLElement;
+    // Don't drag when interacting with input, button, textarea, select, list, scroll, or link elements
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "BUTTON" ||
+      target.tagName === "TEXTAREA" ||
+      target.tagName === "SELECT" ||
+      target.closest("button") ||
+      target.closest("form") ||
+      target.closest("a") ||
+      target.closest(".select-text")
+    ) {
+      return;
+    }
+    dragControls.start(e);
+  };
 
   // Auto-scroll helper
   const scrollToBottom = () => {
@@ -187,14 +207,21 @@ export default function FloatingChatWidget() {
             />
 
             <motion.div
+              drag
+              dragControls={dragControls}
+              dragListener={false}
+              dragConstraints={constraintsRef}
+              dragElastic={0.1}
+              dragMomentum={false}
+              onPointerDown={handlePointerDown}
               initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
               transition={{ type: "spring", duration: 0.35 }}
-              className="relative w-full h-full bg-card-bg border border-card-border sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+              className="relative w-full h-full bg-card-bg border border-card-border sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto cursor-grab active:cursor-grabbing"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3.5 border-b border-card-border bg-neutral-bg/60 select-none">
+              <div className="flex items-center justify-between px-4 py-3.5 border-b border-card-border bg-neutral-bg/60 select-none cursor-grab active:cursor-grabbing">
                 <div className="flex items-center gap-2">
                   <div className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                     <Bot className="h-4.5 w-4.5" />

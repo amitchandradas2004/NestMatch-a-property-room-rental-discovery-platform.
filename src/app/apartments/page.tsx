@@ -12,10 +12,13 @@ import {
   ArrowRight,
   SlidersHorizontal,
   X,
-  ShieldAlert
+  ShieldAlert,
+  ArrowUpDown,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 interface ListingItem {
   _id: string;
@@ -32,6 +35,7 @@ interface ListingItem {
     city: string;
   };
   images?: { url: string }[];
+  createdAt?: string;
 }
 
 export default function ApartmentsPage() {
@@ -42,6 +46,7 @@ export default function ApartmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [maxPrice, setMaxPrice] = useState(250000);
+  const [sortBy, setSortBy] = useState("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 12;
@@ -75,18 +80,38 @@ export default function ApartmentsPage() {
     fetchListings();
   }, []);
 
-  // Filter logic
-  const filteredListings = listings.filter((item) => {
-    const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.location.address.toLowerCase().includes(searchQuery.toLowerCase());
+  // Filter & Sort logic
+  const filteredListings = listings
+    .filter((item) => {
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.location.address.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesType = selectedType === "all" || item.propertyType === selectedType;
-    const matchesPrice = item.price <= maxPrice;
+      const matchesType = selectedType === "all" || item.propertyType === selectedType;
+      const matchesPrice = item.price <= maxPrice;
 
-    return matchesSearch && matchesType && matchesPrice;
-  });
+      return matchesSearch && matchesType && matchesPrice;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : parseInt(a._id.substring(0, 8), 16) * 1000;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : parseInt(b._id.substring(0, 8), 16) * 1000;
+        return dateB - dateA;
+      }
+      if (sortBy === "oldest") {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : parseInt(a._id.substring(0, 8), 16) * 1000;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : parseInt(b._id.substring(0, 8), 16) * 1000;
+        return dateA - dateB;
+      }
+      if (sortBy === "price_asc") {
+        return a.price - b.price;
+      }
+      if (sortBy === "price_desc") {
+        return b.price - a.price;
+      }
+      return 0;
+    });
 
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
@@ -161,8 +186,8 @@ export default function ApartmentsPage() {
                     setCurrentPage(1);
                   }}
                   className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all uppercase tracking-wider cursor-pointer ${selectedType === type
-                      ? "border-primary bg-primary/10 text-primary shadow-sm"
-                      : "border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30 text-muted hover:text-foreground hover:border-slate-350 dark:hover:border-slate-700"
+                    ? "border-primary bg-primary/10 text-primary shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30 text-muted hover:text-foreground hover:border-slate-350 dark:hover:border-slate-700"
                     }`}
                 >
                   {type}
@@ -171,28 +196,57 @@ export default function ApartmentsPage() {
             </div>
           </div>
 
-          {/* Price Range Slider */}
-          <div className="border-t border-card-border pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-extrabold text-muted">
-              <SlidersHorizontal className="h-4 w-4 text-primary" />
-              <span>FILTER BY MAX PRICE:</span>
-              <span className="text-foreground text-sm font-black ml-1">
-                BDT {maxPrice.toLocaleString()}
-              </span>
+          {/* Price Range Slider & Sort Options */}
+          <div className="border-t border-card-border pt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Price Range Slider */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-start gap-4">
+              <div className="flex items-center gap-2 text-xs font-extrabold text-muted">
+                <SlidersHorizontal className="h-4 w-4 text-primary" />
+                <span>FILTER BY MAX PRICE:</span>
+                <span className="text-foreground text-sm font-black ml-1 min-w-[100px]">
+                  BDT {maxPrice.toLocaleString()}
+                </span>
+              </div>
+              <div className="w-full sm:w-64">
+                <input
+                  type="range"
+                  min="5000"
+                  max="250000"
+                  step="5000"
+                  value={maxPrice}
+                  onChange={(e) => {
+                    setMaxPrice(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+              </div>
             </div>
-            <div className="w-full sm:w-72">
-              <input
-                type="range"
-                min="5000"
-                max="250000"
-                step="5000"
-                value={maxPrice}
-                onChange={(e) => {
-                  setMaxPrice(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary"
-              />
+
+            {/* Sort Options */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-4">
+              <div className="flex items-center gap-2 text-xs font-extrabold text-muted">
+                <ArrowUpDown className="h-4 w-4 text-primary" />
+                <span>SORT BY:</span>
+              </div>
+              <div className="relative w-full sm:w-64">
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-primary/10 dark:focus:ring-primary/15 focus:border-primary text-xs font-bold uppercase tracking-wider cursor-pointer appearance-none"
+                >
+                  <option value="newest" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Newest to Oldest</option>
+                  <option value="oldest" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Oldest to Newest</option>
+                  <option value="price_asc" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Price: Low to High</option>
+                  <option value="price_desc" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">Price: High to Low</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-muted">
+                  <ChevronDown className="h-4 w-4 text-slate-400" />
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -243,7 +297,9 @@ export default function ApartmentsPage() {
                     <div className="relative h-56 bg-slate-150 dark:bg-slate-900/80 overflow-hidden flex-shrink-0">
                       {listing.images && listing.images[0]?.url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
+                          height={300}
+                          width={500}
                           src={listing.images[0].url}
                           alt={listing.title}
                           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -336,9 +392,8 @@ export default function ApartmentsPage() {
                       setCurrentPage((prev) => Math.max(prev - 1, 1));
                     }
                   }}
-                  className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                    currentPage === 1 ? "opacity-50" : ""
-                  }`}
+                  className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${currentPage === 1 ? "opacity-50" : ""
+                    }`}
                 >
                   Previous
                 </button>
@@ -348,11 +403,10 @@ export default function ApartmentsPage() {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
-                        currentPage === pageNum
-                          ? "bg-primary text-white shadow-md shadow-primary/10"
-                          : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
-                      }`}
+                      className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${currentPage === pageNum
+                        ? "bg-primary text-white shadow-md shadow-primary/10"
+                        : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -366,9 +420,8 @@ export default function ApartmentsPage() {
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages));
                     }
                   }}
-                  className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                    currentPage === totalPages ? "opacity-50" : ""
-                  }`}
+                  className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${currentPage === totalPages ? "opacity-50" : ""
+                    }`}
                 >
                   Next
                 </button>
