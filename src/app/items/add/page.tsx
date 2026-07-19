@@ -325,9 +325,9 @@ export default function AddApartmentPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <AuthInput
               id="price"
-              label="Price (monthly / BDT)"
+              label="Price (monthly / USD)"
               type="number"
-              placeholder="35000"
+              placeholder="1200"
               error={errors.price?.message}
               {...register("price")}
             />

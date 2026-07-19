@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import Image from "next/image";
 
 interface ListingItem {
   _id: string;
@@ -45,7 +44,7 @@ export default function ApartmentsPage() {
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
-  const [maxPrice, setMaxPrice] = useState(250000);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +62,7 @@ export default function ApartmentsPage() {
     const fetchListings = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/listings", { credentials: "include" });
+        const res = await fetch("/api/listings");
         const resData = await res.json();
         if (res.ok && resData.success) {
           setListings(resData.data || []);
@@ -204,15 +203,15 @@ export default function ApartmentsPage() {
                 <SlidersHorizontal className="h-4 w-4 text-primary" />
                 <span>FILTER BY MAX PRICE:</span>
                 <span className="text-foreground text-sm font-black ml-1 min-w-[100px]">
-                  BDT {maxPrice.toLocaleString()}
+                  USD {maxPrice.toLocaleString()} $
                 </span>
               </div>
               <div className="w-full sm:w-64">
                 <input
                   type="range"
-                  min="5000"
-                  max="250000"
-                  step="5000"
+                  min="100"
+                  max="10000"
+                  step="100"
                   value={maxPrice}
                   onChange={(e) => {
                     setMaxPrice(Number(e.target.value));
@@ -297,9 +296,7 @@ export default function ApartmentsPage() {
                     <div className="relative h-56 bg-slate-150 dark:bg-slate-900/80 overflow-hidden flex-shrink-0">
                       {listing.images && listing.images[0]?.url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <Image
-                          height={300}
-                          width={500}
+                        <img
                           src={listing.images[0].url}
                           alt={listing.title}
                           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -363,7 +360,7 @@ export default function ApartmentsPage() {
                         <div>
                           <p className="text-[10px] font-bold text-muted uppercase tracking-wider">Monthly Rent</p>
                           <p className="text-lg font-black text-primary mt-0.5">
-                            BDT {listing.price.toLocaleString()}
+                            USD {listing.price.toLocaleString()} $
                           </p>
                         </div>
 

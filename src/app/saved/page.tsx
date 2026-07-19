@@ -285,7 +285,7 @@ export default function SavedListingsPage() {
                       {/* Price */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-black text-primary">
-                          BDT {item.listing.price.toLocaleString()}
+                          USD {item.listing.price.toLocaleString()}
                         </span>
                       </td>
 

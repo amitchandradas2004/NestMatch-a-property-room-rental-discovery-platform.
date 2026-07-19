@@ -148,7 +148,7 @@ export default function FeaturedListings() {
                     <div className="pt-4 border-t border-card-border flex items-center justify-between mt-auto">
                       <div>
                         <span className="block text-xs text-muted font-medium">Price</span>
-                        <span className="text-base font-extrabold text-foreground">BDT {property.price.toLocaleString()}</span>
+                        <span className="text-base font-extrabold text-foreground">USD {property.price.toLocaleString()}</span>
                       </div>
                       <Link
                         href={`/apartments/${property._id}`}

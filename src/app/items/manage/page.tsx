@@ -275,7 +275,7 @@ export default function ManageListingsPage() {
                       {/* Price */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-black text-primary">
-                          BDT {listing.price.toLocaleString()}
+                          USD {listing.price.toLocaleString()} $
                         </span>
                       </td>
 
@@ -316,9 +316,8 @@ export default function ManageListingsPage() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1));
                   }
                 }}
-                className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                  currentPage === 1 ? "opacity-50" : ""
-                }`}
+                className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${currentPage === 1 ? "opacity-50" : ""
+                  }`}
               >
                 Previous
               </button>
@@ -328,11 +327,10 @@ export default function ManageListingsPage() {
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
-                      currentPage === pageNum
+                    className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${currentPage === pageNum
                         ? "bg-primary text-white shadow-md shadow-primary/10"
                         : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
-                    }`}
+                      }`}
                   >
                     {pageNum}
                   </button>
@@ -347,9 +345,8 @@ export default function ManageListingsPage() {
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
                   }
                 }}
-                className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                  currentPage === Math.ceil(listings.length / itemsPerPage) ? "opacity-50" : ""
-                }`}
+                className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${currentPage === Math.ceil(listings.length / itemsPerPage) ? "opacity-50" : ""
+                  }`}
               >
                 Next
               </button>

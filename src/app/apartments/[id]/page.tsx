@@ -314,8 +314,8 @@ export default function ApartmentDetailsPage() {
                     type="button"
                     onClick={() => setActiveImageIndex(index)}
                     className={`relative h-14 w-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${activeImageIndex === index
-                        ? "border-primary scale-95"
-                        : "border-transparent hover:border-slate-350 dark:hover:border-slate-700"
+                      ? "border-primary scale-95"
+                      : "border-transparent hover:border-slate-350 dark:hover:border-slate-700"
                       }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -395,7 +395,7 @@ export default function ApartmentDetailsPage() {
             <div>
               <p className="text-xxs font-extrabold text-muted uppercase tracking-widest">Monthly Rent</p>
               <p className="text-2xl font-black text-primary mt-1">
-                BDT {listing.price.toLocaleString()}
+                USD {listing.price.toLocaleString()} $
               </p>
               <p className="text-[10px] text-muted font-bold mt-1">
                 Security deposit requirements depend on owner terms.
@@ -407,8 +407,8 @@ export default function ApartmentDetailsPage() {
               onClick={handleSaveApartment}
               disabled={saving}
               className={`w-full py-3 px-4 rounded-xl text-xs font-extrabold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isSaved
-                  ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20"
-                  : "bg-primary hover:bg-primary-hover text-white shadow-primary/10 hover:shadow-primary/20"
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                : "bg-primary hover:bg-primary-hover text-white shadow-primary/10 hover:shadow-primary/20"
                 }`}
             >
               {saving ? (
@@ -459,8 +459,8 @@ export default function ApartmentDetailsPage() {
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${listing.parkingAvailable
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
-                      : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
+                    : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
                     }`}
                 >
                   {listing.parkingAvailable ? "Available" : "Not Available"}
@@ -474,8 +474,8 @@ export default function ApartmentDetailsPage() {
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${listing.petsAllowed
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
-                      : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
+                    : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
                     }`}
                 >
                   {listing.petsAllowed ? "Allowed" : "Not Allowed"}

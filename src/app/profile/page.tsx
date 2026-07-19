@@ -663,7 +663,7 @@ export default function ProfilePage() {
                           <p className="text-foreground truncate max-w-[200px]">{listing.location.address}, {listing.location.city}</p>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-black text-primary">BDT {listing.price.toLocaleString()}</span>
+                          <span className="text-sm font-black text-primary">USD {listing.price.toLocaleString()}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -786,7 +786,7 @@ export default function ProfilePage() {
                           <p className="text-foreground truncate max-w-[200px]">{item.listing.location.address}, {item.listing.location.city}</p>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-black text-primary">BDT {item.listing.price.toLocaleString()}</span>
+                          <span className="text-sm font-black text-primary">USD {item.listing.price.toLocaleString()}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
