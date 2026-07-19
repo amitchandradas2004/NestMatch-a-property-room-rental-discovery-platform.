@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, message: "Apartment saved successfully!" });
   } catch (error: unknown) {
-    console.error("Failed to save listing:", error);
+    // console.error("Failed to save listing:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to save apartment."
     }, { status: 500 });
@@ -106,7 +106,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, data });
   } catch (error: unknown) {
-    console.error("Failed to fetch saved listings:", error);
+    // console.error("Failed to fetch saved listings:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to retrieve saved listings."
     }, { status: 500 });
@@ -148,7 +148,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true, message: "Saved listing removed successfully." });
   } catch (error: unknown) {
-    console.error("Failed to unsave listing:", error);
+    // console.error("Failed to unsave listing:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to remove saved listing."
     }, { status: 500 });

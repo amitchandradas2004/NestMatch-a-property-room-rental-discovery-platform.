@@ -6,6 +6,8 @@ import ScrollToTop from "../components/scroll-to-top";
 import { Toaster } from "react-hot-toast";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import QueryProvider from "../components/query-provider";
+import FloatingChatWidget from "../components/floating-chat-widget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,21 +55,24 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-200">
-        <ThemeProvider>
-          <Navbar />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-            gutter={12}
-            toastOptions={{
-              duration: 4000,
-            }} />
-          <ScrollToTop />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              gutter={12}
+              toastOptions={{
+                duration: 4000,
+              }} />
+            <ScrollToTop />
+            <FloatingChatWidget />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       id: result.insertedId,
     }, { status: 201 });
   } catch (error: unknown) {
-    console.error("Failed to create listing:", error);
+    // console.error("Failed to create listing:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to submit listing. Please try again."
     }, { status: 500 });
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ success: true, data: listings });
   } catch (error: unknown) {
-    console.error("Failed to fetch listings:", error);
+    // console.error("Failed to fetch listings:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to retrieve listings."
     }, { status: 500 });
@@ -143,7 +143,7 @@ export async function DELETE(request: Request) {
       message: "Listing deleted successfully."
     });
   } catch (error: unknown) {
-    console.error("Failed to delete listing:", error);
+    // console.error("Failed to delete listing:", error);
     return NextResponse.json({
       message: (error as Error).message || "Failed to delete listing. Please try again."
     }, { status: 500 });

@@ -145,7 +145,7 @@ export default function ProfilePage() {
           setSavedListings(savedData.data || []);
         }
       } catch (err) {
-        console.error("Failed to fetch profile activities:", err);
+        // console.error("Failed to fetch profile activities:", err);
       } finally {
         setLoadingListings(false);
       }
@@ -424,8 +424,8 @@ export default function ProfilePage() {
             setIsEditing(!isEditing);
           }}
           className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all cursor-pointer ${isEditing
-              ? "border-rose-500/50 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-              : "border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+            ? "border-rose-500/50 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+            : "border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
             }`}
         >
           {isEditing ? "Cancel Edit" : "Edit Profile"}
@@ -698,9 +698,8 @@ export default function ProfilePage() {
                         setCreatedCurrentPage((prev) => Math.max(prev - 1, 1));
                       }
                     }}
-                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                      createdCurrentPage === 1 ? "opacity-50" : ""
-                    }`}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${createdCurrentPage === 1 ? "opacity-50" : ""
+                      }`}
                   >
                     Previous
                   </button>
@@ -711,8 +710,8 @@ export default function ProfilePage() {
                         key={pageNum}
                         onClick={() => setCreatedCurrentPage(pageNum)}
                         className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${createdCurrentPage === pageNum
-                            ? "bg-primary text-white shadow-md shadow-primary/10"
-                            : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                          ? "bg-primary text-white shadow-md shadow-primary/10"
+                          : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
                           }`}
                       >
                         {pageNum}
@@ -728,9 +727,8 @@ export default function ProfilePage() {
                         setCreatedCurrentPage((prev) => Math.min(prev + 1, totalPages));
                       }
                     }}
-                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                      createdCurrentPage === Math.ceil(createdListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
-                    }`}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${createdCurrentPage === Math.ceil(createdListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
+                      }`}
                   >
                     Next
                   </button>
@@ -823,9 +821,8 @@ export default function ProfilePage() {
                         setSavedCurrentPage((prev) => Math.max(prev - 1, 1));
                       }
                     }}
-                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                      savedCurrentPage === 1 ? "opacity-50" : ""
-                    }`}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${savedCurrentPage === 1 ? "opacity-50" : ""
+                      }`}
                   >
                     Previous
                   </button>
@@ -836,8 +833,8 @@ export default function ProfilePage() {
                         key={pageNum}
                         onClick={() => setSavedCurrentPage(pageNum)}
                         className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${savedCurrentPage === pageNum
-                            ? "bg-primary text-white shadow-md shadow-primary/10"
-                            : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                          ? "bg-primary text-white shadow-md shadow-primary/10"
+                          : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
                           }`}
                       >
                         {pageNum}
@@ -853,9 +850,8 @@ export default function ProfilePage() {
                         setSavedCurrentPage((prev) => Math.min(prev + 1, totalPages));
                       }
                     }}
-                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
-                      savedCurrentPage === Math.ceil(savedListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
-                    }`}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${savedCurrentPage === Math.ceil(savedListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
+                      }`}
                   >
                     Next
                   </button>

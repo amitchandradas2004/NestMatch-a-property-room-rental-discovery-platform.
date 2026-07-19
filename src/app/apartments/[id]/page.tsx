@@ -85,7 +85,7 @@ export default function ApartmentDetailsPage() {
             setIsSaved(alreadySaved);
           }
         } catch (err) {
-          console.error("Failed to verify bookmark status:", err);
+          // console.error("Failed to verify bookmark status:", err);
         }
       };
       checkSavedStatus();
@@ -313,11 +313,10 @@ export default function ApartmentDetailsPage() {
                     key={index}
                     type="button"
                     onClick={() => setActiveImageIndex(index)}
-                    className={`relative h-14 w-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${
-                      activeImageIndex === index
+                    className={`relative h-14 w-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${activeImageIndex === index
                         ? "border-primary scale-95"
                         : "border-transparent hover:border-slate-350 dark:hover:border-slate-700"
-                    }`}
+                      }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -407,11 +406,10 @@ export default function ApartmentDetailsPage() {
             <button
               onClick={handleSaveApartment}
               disabled={saving}
-              className={`w-full py-3 px-4 rounded-xl text-xs font-extrabold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                isSaved
+              className={`w-full py-3 px-4 rounded-xl text-xs font-extrabold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isSaved
                   ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20"
                   : "bg-primary hover:bg-primary-hover text-white shadow-primary/10 hover:shadow-primary/20"
-              }`}
+                }`}
             >
               {saving ? (
                 <>
@@ -460,11 +458,10 @@ export default function ApartmentDetailsPage() {
                   <span>Parking Slot</span>
                 </span>
                 <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
-                    listing.parkingAvailable
+                  className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${listing.parkingAvailable
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
                       : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
-                  }`}
+                    }`}
                 >
                   {listing.parkingAvailable ? "Available" : "Not Available"}
                 </span>
@@ -476,11 +473,10 @@ export default function ApartmentDetailsPage() {
                   <span>Pet Friendly</span>
                 </span>
                 <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
-                    listing.petsAllowed
+                  className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${listing.petsAllowed
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450"
                       : "bg-rose-500/10 text-rose-600 dark:text-rose-450"
-                  }`}
+                    }`}
                 >
                   {listing.petsAllowed ? "Allowed" : "Not Allowed"}
                 </span>

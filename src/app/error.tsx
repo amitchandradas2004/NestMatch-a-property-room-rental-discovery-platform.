@@ -14,12 +14,12 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error("Runtime error caught:", error);
+    // console.error("Runtime error caught:", error);
   }, [error]);
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden bg-neutral-bg select-none">
-      
+
       {/* Background glowing decorations */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <motion.div
