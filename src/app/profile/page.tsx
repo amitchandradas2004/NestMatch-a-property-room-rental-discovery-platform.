@@ -87,6 +87,10 @@ export default function ProfilePage() {
   const [savedListings, setSavedListings] = useState<SavedItem[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
 
+  const [createdCurrentPage, setCreatedCurrentPage] = useState(1);
+  const [savedCurrentPage, setSavedCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
   const {
     data: session,
     isPending,
@@ -154,7 +158,14 @@ export default function ProfilePage() {
 
       if (res.ok && data.success) {
         toast.success("Listing deleted successfully!");
-        setCreatedListings((prev) => prev.filter((item) => item._id !== id));
+        setCreatedListings((prev) => {
+          const newList = prev.filter((item) => item._id !== id);
+          const totalPages = Math.ceil(newList.length / ITEMS_PER_PAGE);
+          if (createdCurrentPage > totalPages && totalPages > 0) {
+            setCreatedCurrentPage(totalPages);
+          }
+          return newList;
+        });
         setListingToDelete(null);
       } else {
         toast.error(data.message || "Failed to delete listing.");
@@ -183,7 +194,14 @@ export default function ProfilePage() {
 
       if (res.ok && data.success) {
         toast.success("Bookmark removed successfully!");
-        setSavedListings((prev) => prev.filter((item) => item._id !== savedId));
+        setSavedListings((prev) => {
+          const newList = prev.filter((item) => item._id !== savedId);
+          const totalPages = Math.ceil(newList.length / ITEMS_PER_PAGE);
+          if (savedCurrentPage > totalPages && totalPages > 0) {
+            setSavedCurrentPage(totalPages);
+          }
+          return newList;
+        });
         setBookmarkToRemove(null);
       } else {
         toast.error(data.message || "Failed to remove bookmark.");
@@ -596,62 +614,100 @@ export default function ProfilePage() {
               You haven&apos;t published any property listings yet.
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
-              <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead>
-                  <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
-                    <th className="px-6 py-4">Preview</th>
-                    <th className="px-6 py-4">Title</th>
-                    <th className="px-6 py-4">Location</th>
-                    <th className="px-6 py-4">Monthly Rent</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
-                  {createdListings.map((listing) => (
-                    <tr key={listing._id} className="hover:bg-neutral-bg/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
-                          {listing.images && listing.images[0]?.url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={listing.images[0].url} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <Building className="h-4 w-4 text-slate-400" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="max-w-[220px] truncate">
-                          <p className="font-extrabold text-foreground truncate">{listing.title}</p>
-                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{listing.propertyType}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-foreground truncate max-w-[200px]">{listing.location.address}, {listing.location.city}</p>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-black text-primary">BDT {listing.price.toLocaleString()}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/apartments/${listing._id}`}
-                            className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteCreated(listing)}
-                            className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+            <div className="space-y-6">
+              <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
+                <table className="w-full text-left border-collapse min-w-[700px]">
+                  <thead>
+                    <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
+                      <th className="px-6 py-4">Preview</th>
+                      <th className="px-6 py-4">Title</th>
+                      <th className="px-6 py-4">Location</th>
+                      <th className="px-6 py-4">Monthly Rent</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
+                    {createdListings.slice((createdCurrentPage - 1) * ITEMS_PER_PAGE, createdCurrentPage * ITEMS_PER_PAGE).map((listing) => (
+                      <tr key={listing._id} className="hover:bg-neutral-bg/30 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
+                            {listing.images && listing.images[0]?.url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={listing.images[0].url} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              <Building className="h-4 w-4 text-slate-400" />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="max-w-[220px] truncate">
+                            <p className="font-extrabold text-foreground truncate">{listing.title}</p>
+                            <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{listing.propertyType}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-foreground truncate max-w-[200px]">{listing.location.address}, {listing.location.city}</p>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-black text-primary">BDT {listing.price.toLocaleString()}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/apartments/${listing._id}`}
+                              className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteCreated(listing)}
+                              className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {Math.ceil(createdListings.length / ITEMS_PER_PAGE) > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <button
+                    onClick={() => setCreatedCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={createdCurrentPage === 1}
+                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: Math.ceil(createdListings.length / ITEMS_PER_PAGE) }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCreatedCurrentPage(pageNum)}
+                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                          createdCurrentPage === pageNum
+                            ? "bg-primary text-white shadow-md shadow-primary/10"
+                            : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setCreatedCurrentPage((prev) => Math.min(prev + 1, Math.ceil(createdListings.length / ITEMS_PER_PAGE)))}
+                    disabled={createdCurrentPage === Math.ceil(createdListings.length / ITEMS_PER_PAGE)}
+                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -669,62 +725,100 @@ export default function ProfilePage() {
               You haven&apos;t saved any listings yet.
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
-              <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead>
-                  <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
-                    <th className="px-6 py-4">Preview</th>
-                    <th className="px-6 py-4">Title</th>
-                    <th className="px-6 py-4">Location</th>
-                    <th className="px-6 py-4">Monthly Rent</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
-                  {savedListings.map((item) => (
-                    <tr key={item._id} className="hover:bg-neutral-bg/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
-                          {item.listing.images && item.listing.images[0]?.url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={item.listing.images[0].url} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <Building className="h-4 w-4 text-slate-400" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="max-w-[220px] truncate">
-                          <p className="font-extrabold text-foreground truncate">{item.listing.title}</p>
-                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{item.listing.propertyType}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="text-foreground truncate max-w-[200px]">{item.listing.location.address}, {item.listing.location.city}</p>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-black text-primary">BDT {item.listing.price.toLocaleString()}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/apartments/${item.listing._id}`}
-                            className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleRemoveSaved(item)}
-                            className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+            <div className="space-y-6">
+              <div className="overflow-x-auto rounded-2xl border border-card-border bg-card-bg shadow-sm">
+                <table className="w-full text-left border-collapse min-w-[700px]">
+                  <thead>
+                    <tr className="border-b border-card-border bg-neutral-bg/50 text-[10px] font-bold text-muted uppercase tracking-wider">
+                      <th className="px-6 py-4">Preview</th>
+                      <th className="px-6 py-4">Title</th>
+                      <th className="px-6 py-4">Location</th>
+                      <th className="px-6 py-4">Monthly Rent</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-card-border text-sm font-semibold text-foreground">
+                    {savedListings.slice((savedCurrentPage - 1) * ITEMS_PER_PAGE, savedCurrentPage * ITEMS_PER_PAGE).map((item) => (
+                      <tr key={item._id} className="hover:bg-neutral-bg/30 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="h-10 w-14 rounded-lg bg-slate-100 dark:bg-slate-900/60 overflow-hidden flex items-center justify-center border border-card-border flex-shrink-0">
+                            {item.listing.images && item.listing.images[0]?.url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={item.listing.images[0].url} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              <Building className="h-4 w-4 text-slate-400" />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="max-w-[220px] truncate">
+                            <p className="font-extrabold text-foreground truncate">{item.listing.title}</p>
+                            <p className="text-[10px] font-bold text-muted uppercase tracking-wider mt-0.5">{item.listing.propertyType}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-foreground truncate max-w-[200px]">{item.listing.location.address}, {item.listing.location.city}</p>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-black text-primary">BDT {item.listing.price.toLocaleString()}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/apartments/${item.listing._id}`}
+                              className="p-2 rounded-xl border border-card-border hover:border-primary/30 text-muted hover:text-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                            <button
+                              onClick={() => handleRemoveSaved(item)}
+                              className="p-2 rounded-xl border border-rose-500/10 hover:border-rose-500/35 text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {Math.ceil(savedListings.length / ITEMS_PER_PAGE) > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <button
+                    onClick={() => setSavedCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={savedCurrentPage === 1}
+                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: Math.ceil(savedListings.length / ITEMS_PER_PAGE) }).map((_, idx) => {
+                    const pageNum = idx + 1;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setSavedCurrentPage(pageNum)}
+                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+                          savedCurrentPage === pageNum
+                            ? "bg-primary text-white shadow-md shadow-primary/10"
+                            : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setSavedCurrentPage((prev) => Math.min(prev + 1, Math.ceil(savedListings.length / ITEMS_PER_PAGE)))}
+                    disabled={savedCurrentPage === Math.ceil(savedListings.length / ITEMS_PER_PAGE)}
+                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
