@@ -91,6 +91,21 @@ export default function ProfilePage() {
   const [savedCurrentPage, setSavedCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
+  const [createdPaginationAlert, setCreatedPaginationAlert] = useState<{
+    isOpen: boolean;
+    direction: "previous" | "next" | null;
+  }>({
+    isOpen: false,
+    direction: null,
+  });
+  const [savedPaginationAlert, setSavedPaginationAlert] = useState<{
+    isOpen: boolean;
+    direction: "previous" | "next" | null;
+  }>({
+    isOpen: false,
+    direction: null,
+  });
+
   const {
     data: session,
     isPending,
@@ -408,11 +423,10 @@ export default function ProfilePage() {
             }
             setIsEditing(!isEditing);
           }}
-          className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all cursor-pointer ${
-            isEditing
+          className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all cursor-pointer ${isEditing
               ? "border-rose-500/50 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
               : "border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
-          }`}
+            }`}
         >
           {isEditing ? "Cancel Edit" : "Edit Profile"}
         </button>
@@ -677,9 +691,16 @@ export default function ProfilePage() {
               {Math.ceil(createdListings.length / ITEMS_PER_PAGE) > 1 && (
                 <div className="flex items-center justify-center gap-2 pt-2">
                   <button
-                    onClick={() => setCreatedCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={createdCurrentPage === 1}
-                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                    onClick={() => {
+                      if (createdCurrentPage === 1) {
+                        setCreatedPaginationAlert({ isOpen: true, direction: "previous" });
+                      } else {
+                        setCreatedCurrentPage((prev) => Math.max(prev - 1, 1));
+                      }
+                    }}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
+                      createdCurrentPage === 1 ? "opacity-50" : ""
+                    }`}
                   >
                     Previous
                   </button>
@@ -689,20 +710,27 @@ export default function ProfilePage() {
                       <button
                         key={pageNum}
                         onClick={() => setCreatedCurrentPage(pageNum)}
-                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
-                          createdCurrentPage === pageNum
+                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${createdCurrentPage === pageNum
                             ? "bg-primary text-white shadow-md shadow-primary/10"
                             : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>
                     );
                   })}
                   <button
-                    onClick={() => setCreatedCurrentPage((prev) => Math.min(prev + 1, Math.ceil(createdListings.length / ITEMS_PER_PAGE)))}
-                    disabled={createdCurrentPage === Math.ceil(createdListings.length / ITEMS_PER_PAGE)}
-                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                    onClick={() => {
+                      const totalPages = Math.ceil(createdListings.length / ITEMS_PER_PAGE);
+                      if (createdCurrentPage === totalPages) {
+                        setCreatedPaginationAlert({ isOpen: true, direction: "next" });
+                      } else {
+                        setCreatedCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                      }
+                    }}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
+                      createdCurrentPage === Math.ceil(createdListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
+                    }`}
                   >
                     Next
                   </button>
@@ -788,9 +816,16 @@ export default function ProfilePage() {
               {Math.ceil(savedListings.length / ITEMS_PER_PAGE) > 1 && (
                 <div className="flex items-center justify-center gap-2 pt-2">
                   <button
-                    onClick={() => setSavedCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={savedCurrentPage === 1}
-                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                    onClick={() => {
+                      if (savedCurrentPage === 1) {
+                        setSavedPaginationAlert({ isOpen: true, direction: "previous" });
+                      } else {
+                        setSavedCurrentPage((prev) => Math.max(prev - 1, 1));
+                      }
+                    }}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
+                      savedCurrentPage === 1 ? "opacity-50" : ""
+                    }`}
                   >
                     Previous
                   </button>
@@ -800,20 +835,27 @@ export default function ProfilePage() {
                       <button
                         key={pageNum}
                         onClick={() => setSavedCurrentPage(pageNum)}
-                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${
-                          savedCurrentPage === pageNum
+                        className={`h-10 w-10 text-sm font-bold rounded-xl transition-all cursor-pointer ${savedCurrentPage === pageNum
                             ? "bg-primary text-white shadow-md shadow-primary/10"
                             : "border border-card-border bg-card-bg hover:bg-neutral-bg text-foreground"
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>
                     );
                   })}
                   <button
-                    onClick={() => setSavedCurrentPage((prev) => Math.min(prev + 1, Math.ceil(savedListings.length / ITEMS_PER_PAGE)))}
-                    disabled={savedCurrentPage === Math.ceil(savedListings.length / ITEMS_PER_PAGE)}
-                    className="px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg disabled:opacity-50 transition-colors disabled:cursor-not-allowed cursor-pointer"
+                    onClick={() => {
+                      const totalPages = Math.ceil(savedListings.length / ITEMS_PER_PAGE);
+                      if (savedCurrentPage === totalPages) {
+                        setSavedPaginationAlert({ isOpen: true, direction: "next" });
+                      } else {
+                        setSavedCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                      }
+                    }}
+                    className={`px-4 py-2 border border-card-border bg-card-bg text-sm font-semibold rounded-xl hover:bg-neutral-bg transition-colors cursor-pointer ${
+                      savedCurrentPage === Math.ceil(savedListings.length / ITEMS_PER_PAGE) ? "opacity-50" : ""
+                    }`}
                   >
                     Next
                   </button>
@@ -1141,6 +1183,118 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => setIsDemoRestrictionModalOpen(false)}
                   className="flex-1 py-2.5 border border-card-border hover:bg-neutral-bg text-xs uppercase tracking-wider font-extrabold rounded-xl cursor-pointer"
+                >
+                  Understood
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* PUBLISHED LISTINGS PAGINATION ALERT MODAL */}
+      <AnimatePresence>
+        {createdPaginationAlert.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setCreatedPaginationAlert({ isOpen: false, direction: null })}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-card-bg border border-card-border p-6 rounded-2xl shadow-xl space-y-5 text-foreground z-10 overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={() => setCreatedPaginationAlert({ isOpen: false, direction: null })}
+                className="absolute top-4 right-4 p-1.5 rounded-xl border border-card-border text-muted hover:text-foreground hover:bg-neutral-bg/40 transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="flex flex-col items-center text-center space-y-4 pt-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <ShieldAlert className="h-6 w-6" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-base font-extrabold text-foreground">
+                    {createdPaginationAlert.direction === "previous" ? "First Page Reached" : "Last Page Reached"}
+                  </h3>
+                  <p className="text-xs text-muted font-bold px-2">
+                    {createdPaginationAlert.direction === "previous"
+                      ? "There are no previous pages available. You are already on the first page."
+                      : "There are no next pages available. You are already on the last page."}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCreatedPaginationAlert({ isOpen: false, direction: null })}
+                  className="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-extrabold shadow-md shadow-primary/10 hover:shadow-primary/25 transition-all cursor-pointer"
+                >
+                  Understood
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* BOOKMARKED APARTMENTS PAGINATION ALERT MODAL */}
+      <AnimatePresence>
+        {savedPaginationAlert.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSavedPaginationAlert({ isOpen: false, direction: null })}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-card-bg border border-card-border p-6 rounded-2xl shadow-xl space-y-5 text-foreground z-10 overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={() => setSavedPaginationAlert({ isOpen: false, direction: null })}
+                className="absolute top-4 right-4 p-1.5 rounded-xl border border-card-border text-muted hover:text-foreground hover:bg-neutral-bg/40 transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="flex flex-col items-center text-center space-y-4 pt-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-rose-500">
+                  <ShieldAlert className="h-6 w-6" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-base font-extrabold text-foreground">
+                    {savedPaginationAlert.direction === "previous" ? "First Page Reached" : "Last Page Reached"}
+                  </h3>
+                  <p className="text-xs text-muted font-bold px-2">
+                    {savedPaginationAlert.direction === "previous"
+                      ? "There are no previous pages available. You are already on the first page."
+                      : "There are no next pages available. You are already on the last page."}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSavedPaginationAlert({ isOpen: false, direction: null })}
+                  className="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-extrabold shadow-md shadow-primary/10 hover:shadow-primary/25 transition-all cursor-pointer"
                 >
                   Understood
                 </button>
